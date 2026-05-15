@@ -33,6 +33,8 @@ One space — use it.
 ```
 aws___call_aws(cli_command="aws devops-agent create-chat --agent-space-id as-abc123 --user-id jdoe --user-type IAM --region us-east-1")
 → { "executionId": "exec-chat-001" }
+
+> **Note:** If `create-chat` fails with "User identity could not be resolved", your account may lack Operator App registration. Skip to Step 4 (investigation) — investigations don't require chat identity.
 ```
 
 ```python
