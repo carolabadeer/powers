@@ -50,6 +50,7 @@ Best for: cost optimization, architecture review, topology mapping, knowledge di
 
 ## Common Mistakes to Avoid
 - ❌ Do NOT use `import boto3` in `aws___run_script` — the sandbox blocks it. Use `await call_boto3(...)` instead
+- ❌ Do NOT use `call_boto3(SendMessage)` with investigation executionIds (`exe-ops1-*` format) — only the CLI path handles these. Use `call_boto3` for chat sessions only (pure UUID from `create-chat`)
 - ❌ Do NOT use `aws___call_aws` for `SendMessage` — it returns an EventStream that `call_aws` cannot handle. Use `aws___run_script` instead
 - ❌ Do NOT ask "should I investigate or chat?" — auto-route based on keywords
 - ❌ Do NOT forget `--task-type INVESTIGATION` when creating backlog tasks (required)
