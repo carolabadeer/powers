@@ -1,7 +1,7 @@
 ---
 name: "databricks"
 displayName: "Databricks AI Dev Kit"
-description: "Comprehensive Databricks development toolkit with 44 MCP tools (180+ operations) and expert guidance for building data pipelines, ML workflows, dashboards, jobs, and applications on the Databricks Data Intelligence Platform."
+description: "Comprehensive Databricks development toolkit with 44 MCP tools (180+ operations) and expert guidance for building data pipelines, ML workflows, dashboards, jobs, and applications on Databricks platform."
 keywords: ["databricks", "spark", "delta", "mlflow", "unity catalog", "pipelines", "jobs", "sql", "data engineering", "machine learning"]
 author: "AWS"
 ---
@@ -684,7 +684,62 @@ This scopes skills to the Power (loaded only when the Power is active) and remov
 
 ### Step 3: Configure Authentication
 
-The Power ships with a baseline `mcp.json` that uses an env-var reference for the profile name and is **disabled by default** for safety. Pick one of the three options below and apply the matching "after" configuration.
+The Power ships with a baseline `mcp.json` that uses an env-var reference for the profile name and is **disabled by default** for safety. Pick one of the four options below and apply the matching "after" configuration.
+
+> **⚠️ Agent behavior during onboarding (REQUIRED):**
+>
+> Before configuring or modifying any credentials, the agent MUST:
+>
+> 1. **Check for existing credentials** in two locations:
+>    - The top-level `mcpServers` block in `~/.kiro/settings/mcp.json` (e.g., from a prior installation or another Databricks-using Power)
+>    - Profiles in `~/.databrickscfg`
+> 2. **Show the user enough to identify the credentials, but never the full secret.** The user needs to recognize *which* credential they are looking at — show identifiers and short prefix/suffix fingerprints — but the bulk of the secret must not be echoed.
+>
+>    | Display this | Hide this |
+>    |---|---|
+>    | Profile name (e.g., `[DEFAULT]`, `[prod-aws]`) | — |
+>    | Workspace host URL | — |
+>    | `auth_type` field value | — |
+>    | `client_id` (full — it's a public identifier) | `client_secret` (only first 4 + last 4 chars; never the middle) |
+>    | PAT in the form `dapi` + 4 chars + `***` + last 4 chars (e.g., `dapi5f2a***4f2c`), plus token comment if present | The middle of the PAT |
+>    | OAuth secret first 4 + `***` + last 4 chars (e.g., `abcd***9z8y`), plus last-modified date if known | The middle of the secret |
+>    | OAuth U2M `auth_type = databricks-cli` label only | Cached access/refresh tokens from `~/.databricks/token-cache.json` |
+>
+>    Preserving the `dapi` prefix on PATs makes the token type unmistakable; the 4-char fingerprints on either side are enough for the user to recognize a credential they generated themselves (matching it against their notes or a credential manager) without exposing usable token material.
+>
+> 3. **Ask for explicit confirmation** before reusing detected credentials. Offer three choices:
+>    - Reuse the detected credentials for this Power
+>    - Configure a different authentication option (A / B / C / D below)
+>    - Skip — the user will edit `mcp.json` themselves
+> 4. **Never copy credentials between configurations without explicit user approval.** Silent reuse is not acceptable, even when the credentials appear identical or compatible.
+>
+> Example of an acceptable summary the agent shows the user:
+> ```
+> Found existing Databricks configuration:
+>
+>   ~/.kiro/settings/mcp.json (top-level mcpServers.databricks):
+>     host        = https://acme.cloud.databricks.com
+>     auth method = OAuth U2M (via DATABRICKS_CONFIG_PROFILE=DEFAULT)
+>
+>   ~/.databrickscfg:
+>     [DEFAULT]
+>       host       = https://acme.cloud.databricks.com
+>       auth_type  = databricks-cli
+>     [prod-aws]
+>       host       = https://acme-prod.cloud.databricks.com
+>       auth_type  = pat
+>       token      = dapi5f2a***4f2c     (dapi prefix + 4 + last 4)
+>       comment    = "Power onboarding 2026-05-19"
+>     [ci-sp]
+>       host          = https://acme.cloud.databricks.com
+>       client_id     = 1a2b3c4d-5e6f-7890-abcd-ef1234567890
+>       client_secret = abcd***9z8y    (first 4 + last 4 only)
+>
+> Would you like to:
+>   1. Reuse the [DEFAULT] profile for this Power
+>   2. Configure a different auth option (A / B / C / D below)
+>   3. Skip — I'll edit mcp.json myself
+> ```
 
 #### Baseline (as shipped — before any configuration)
 
@@ -988,7 +1043,7 @@ The MCP server and skills installed by this Power are sourced from the [databric
 ### Contributors
 
 - [@antonyprasad-db](https://github.com/antonyprasad-db) — Senior Specialist Solutions Architect, Databricks (AWS Partnership). Built the underlying **Databricks AI Dev Kit** (the MCP server, skills, and unified installer) at [databricks-solutions/ai-dev-kit](https://github.com/databricks-solutions/ai-dev-kit), including the Kiro IDE installer support in [PR #511](https://github.com/databricks-solutions/ai-dev-kit/pull/511) that this Power depends on. Built the **v2 optimization of this Power** in [this fork](https://github.com/antonyprasad-db/databricks/tree/v2-aws-authored-power) — reframed authorship to AWS-published, added the Trademarks subsection, and prepared the catalog entry for submission to [kirodotdev/powers](https://github.com/kirodotdev/powers).
-- [@venkatavaradhanv](https://github.com/venkatavaradhanv) — Solutions Architect, AWS. Created the original wrapper Power around the Databricks AI Dev Kit at [venkatavaradhanv/databricks](https://github.com/venkatavaradhanv/databricks), packaging the catalog-ready `POWER.md`, the parametrized `mcp.json`, and the four-option auth documentation (OAuth U2M / OAuth M2M / existing profile / PAT).
+- [@venkatavaradhanv](https://github.com/venkatavaradhanv) — Solutions Architect, AWS. Created the original wrapper Power around the Databricks AI Dev Kit at [venkatavaradhanv/databricks](https://github.com/venkatavaradhanv/databricks), packaging the catalog-ready `POWER.md`, the parametrized `mcp.json`, the four-option auth documentation (OAuth U2M / OAuth M2M / existing profile / PAT), and the security-conscious credential-detection onboarding flow (8 use-cases across the 4 auth options with safe fingerprinting rules).
 
 ### Support
 
