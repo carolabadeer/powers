@@ -602,16 +602,16 @@ Include test scripts in all requests to validate:
    - Extract `collectionId` or `collectionUid`
    - Extract `environmentId` for variable substitution
 
-**STEP 2: Verify API availability** (optional but recommended)
-   - Test base URL with simple GET request
-   - Confirm authentication is working
+**STEP 2: Verify API availability**
+   - If the target API is a local server, ensure it is running before executing the collection
+   - For remote APIs (e.g. staging, production, cloud endpoints), skip this check
 
 **STEP 3: Run collection**
    ```
    Use: runCollection
    Parameters: 
      - collectionId (required)
-     - environmentId (optional but recommended)
+     - environmentId (always pass if available — environment variables must be resolved for tests to work correctly)
      - iterationCount (default: 1)
      - requestTimeout (default: 60000ms)
    ```
@@ -1011,7 +1011,7 @@ Use environment variables for:
 
 ### ❌ Pitfall 5: Using curl Instead of Postman
 **Problem**: Bypassing Postman's test framework
-**Solution**: Always use Postman MCP tools for testing
+**Solution**: Always use Postman MCP tools for testing — never use curl or any other HTTP clients
 
 ---
 
@@ -1078,9 +1078,9 @@ Always use: `.postman.json` in project root
 
 ### Test Execution Rules
 1. ✅ Always use Postman MCP tools for testing
-2. ❌ Never use curl or other HTTP clients
-3. ✅ Verify API server is running first
-4. ✅ Use environment for variable substitution
+2. ❌ Never use curl or any other HTTP clients
+3. ✅ If target API is local, verify server is running first; skip for remote APIs
+4. ✅ Always pass environmentId to `runCollection` if available
 5. ✅ Display comprehensive test results
 6. ✅ Offer to fix failures
 
@@ -1115,6 +1115,8 @@ This steering guide ensures consistent, reliable API testing workflows using Pos
 - Always save configuration to `.postman.json`
 - Use environments for all variable data
 - Add comprehensive test scripts to all requests
-- Run tests through Postman MCP tools only
+- Run tests through Postman MCP tools only (never curl or other HTTP clients)
+- Always pass environmentId to `runCollection` when available
+- Check if local server is running before testing local APIs; skip for remote
 - Display detailed results and offer to fix failures
 - Keep collections in sync with API changes
